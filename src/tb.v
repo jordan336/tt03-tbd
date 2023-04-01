@@ -9,6 +9,6 @@ module tb (input [7:0] io_in,
     #1;
   end
 
-  jordan336_tbd tbd(.io_in(io_in),
-                    .io_out(io_out));
+  jordan336_toy_cpu toy(.io_in(io_in),
+                        .io_out(io_out));
 endmodule

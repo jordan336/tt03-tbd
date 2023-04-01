@@ -9,7 +9,7 @@ TOPLEVEL_LANG ?= verilog
 ifneq ($(GATES),yes)
 
 # this is the only part you should need to modify:
-VERILOG_SOURCES += $(PWD)/tb.v $(PWD)/jordan336_tbd.v
+VERILOG_SOURCES += $(PWD)/tb.v $(PWD)/jordan336_toy_cpu.v
 
 else
 

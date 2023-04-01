@@ -3,7 +3,7 @@ from cocotb.triggers import Timer
 import random
 
 @cocotb.test()
-async def test_tbd(dut):
+async def test_toy_cpu(dut):
     random_int = random.randint(0, 255)
     expected_int = ~random_int & 0xff
 
