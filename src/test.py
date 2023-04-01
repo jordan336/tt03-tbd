@@ -3,17 +3,14 @@ from cocotb.triggers import Timer
 import random
 
 @cocotb.test()
-async def test_toy_cpu(dut):
-    random_int = random.randint(0, 255)
-    expected_int = ~random_int & 0xff
+async def test_nop(dut):
+    dut._log.info("Test NOP")
 
-    dut._log.info("jordan336 start")
-
-    dut.io_in.value = random_int
+    dut.io_in.value = 0
     await Timer(1, units="ns")
 
     dut._log.info("io_in: %s", dut.io_in.value)
     dut._log.info("io_out: %s", dut.io_out.value)
 
-    assert int(dut.io_out.value) == expected_int
+    assert int(dut.io_out.value) == 1
 
