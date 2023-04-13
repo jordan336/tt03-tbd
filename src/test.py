@@ -94,6 +94,9 @@ def check_fetch(dut, opcode=None, opcode_valid=1, dest=None, src_a=None, src_b=N
     if imm is not None:
         assert int(dut.toy.fetch.imm) == imm
 
+def check_out(dut, out_val):
+    assert int(dut.io_out) == out_val
+
 @cocotb.test()
 async def fetch_disp(dut):
     src = random.randint(0, 7)
@@ -196,13 +199,18 @@ async def fetch_b2b_add_and(dut):
     await execute_and(dut, dest, src_a, src_b)
     check_fetch(dut, 3, dest=dest, src_a=src_a, src_b=src_b)
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def disp(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.toy.fetch.opcode) == 0
-    assert int(dut.io_out.value) == 1
+    reg = random.randint(0, 7)
+    imm = random.randint(0, 255)
+    await do_preamble(dut)
+    await execute_disp(dut, reg)
+    await FallingEdge(dut.clk)
+    check_out(dut, 0)
+    await execute_store(dut, reg, imm)
+    await execute_disp(dut, reg)
+    await FallingEdge(dut.clk)
+    check_out(dut, imm)
 
 @cocotb.test(skip=True)
 async def add(dut):
