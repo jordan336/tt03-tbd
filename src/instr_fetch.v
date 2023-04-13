@@ -41,11 +41,13 @@ module instr_fetch (input            clk,
       STATE_ONE: begin
         load_opcode = 1;
         load_src_a = 1;
-        if (in[5:3] === 3'b000) begin
-          new_state = STATE_ONE;
-          op_valid_next = 1;
-        end else begin
-          new_state = STATE_TWO;
+        if (!$isunknown(in[5:3])) begin
+          if (in[5:3] === 3'b000) begin
+            new_state = STATE_ONE;
+            op_valid_next = 1;
+          end else begin
+            new_state = STATE_TWO;
+          end
         end
       end
       STATE_TWO: begin

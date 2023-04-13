@@ -37,6 +37,8 @@ async def drive_instr(dut, bits35, bits02):
     instr_val.binstr = '{:03b}{:03b}'.format(bits35, bits02)
     dut.instr.value = instr_val
     await FallingEdge(dut.clk)
+    instr_val.binstr = 'xxxxxx'
+    dut.instr.value = instr_val
 
 async def execute_disp(dut, src):
     await drive_instr(dut, 0, src)
@@ -79,9 +81,10 @@ async def execute_store(dut, dest, imm):
     await drive_instr(dut, dest, imm_75)
     await drive_instr(dut, imm_43, imm_20)
 
-def check_fetch(dut, opcode, dest=None, src_a=None, src_b=None, imm=None):
-    assert int(dut.toy.fetch.op_valid) == 1
-    assert int(dut.toy.fetch.opcode) == opcode
+def check_fetch(dut, opcode=None, opcode_valid=1, dest=None, src_a=None, src_b=None, imm=None):
+    if opcode is not None:
+        assert int(dut.toy.fetch.opcode) == opcode
+    assert int(dut.toy.fetch.op_valid) == opcode_valid
     if dest is not None:
         assert int(dut.toy.fetch.dest) == dest
     if src_a is not None:
@@ -96,7 +99,7 @@ async def fetch_disp(dut):
     src = random.randint(0, 7)
     await do_preamble(dut)
     await execute_disp(dut, src)
-    check_fetch(dut, opcode=0, src_a=src)
+    check_fetch(dut, 0, src_a=src)
 
 @cocotb.test()
 async def fetch_add(dut):
@@ -159,6 +162,39 @@ async def fetch_store(dut):
     await do_preamble(dut)
     await execute_store(dut, dest, imm)
     check_fetch(dut, 7, dest=dest, imm=imm)
+
+@cocotb.test()
+async def fetch_intermediate_check(dut):
+    start_clk(dut)
+    await exit_reset(dut)
+    check_fetch(dut, opcode_valid=0)
+    await exit_start_state(dut)
+    check_fetch(dut, opcode_valid=0)
+    await drive_instr(dut, 4, 0)
+    check_fetch(dut, opcode_valid=0)
+    await drive_instr(dut, 1, 2)
+    check_fetch(dut, opcode_valid=0)
+    await drive_instr(dut, 3, 4)
+    check_fetch(dut, opcode=4, opcode_valid=1)
+
+@cocotb.test()
+async def fetch_b2b_add_and(dut):
+    dest = random.randint(0, 7)
+    src_a = random.randint(0, 7)
+    src_b = random.randint(0, 7)
+    await do_preamble(dut)
+    # Execute add
+    await execute_add(dut, dest, src_a, src_b)
+    check_fetch(dut, 1, dest=dest, src_a=src_a, src_b=src_b)
+    # Check op is not valid
+    await FallingEdge(dut.clk)
+    check_fetch(dut, opcode_valid=0)
+    # Execute and
+    dest = random.randint(0, 7)
+    src_a = random.randint(0, 7)
+    src_b = random.randint(0, 7)
+    await execute_and(dut, dest, src_a, src_b)
+    check_fetch(dut, 3, dest=dest, src_a=src_a, src_b=src_b)
 
 @cocotb.test(skip=True)
 async def disp(dut):
