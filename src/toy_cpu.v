@@ -11,11 +11,15 @@ module toy_cpu (input        clk,
   wire [7:0] reg_wr_data = (opcode == 3'b111) ? imm : out;
   wire [7:0] reg_out0;
   wire [7:0] reg_out1;
-  reg opcode_imm = ((opcode === 3'b010) ||
-                    (opcode === 3'b100) ||
-                    (opcode === 3'b110));
-  wire [7:0] alu_b = opcode_imm ? imm : reg_out1;
+  wire opcode_imm;
+  wire [7:0] alu_b;
   reg [2:0] opcode_d;
+
+  assign opcode_imm = ((opcode === 3'b010) ||
+                       (opcode === 3'b100) ||
+                       (opcode === 3'b110));
+
+  assign alu_b = opcode_imm ? imm : reg_out1;
 
   always @(posedge clk) begin
     opcode_d <= opcode;
