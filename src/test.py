@@ -21,7 +21,6 @@ async def exit_reset(dut):
     dut.rst.value = 1;
     await FallingEdge(dut.clk)
     dut.rst.value = 0;
-    await FallingEdge(dut.clk)
 
 async def exit_start_state(dut):
     dut.instr.value = 0x3f
@@ -37,7 +36,7 @@ async def drive_instr(dut, bits35, bits02):
     instr_val.binstr = '{:03b}{:03b}'.format(bits35, bits02)
     dut.instr.value = instr_val
     await FallingEdge(dut.clk)
-    instr_val.binstr = 'xxxxxx'
+    instr_val.binstr = 'zzzzzz'
     dut.instr.value = instr_val
 
 async def execute_disp(dut, src):
