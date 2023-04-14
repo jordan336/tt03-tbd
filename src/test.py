@@ -247,12 +247,25 @@ async def add_i(dut):
     await execute_disp(dut, src)
     await check_out(dut, 0)
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def _and(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x18
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 8
+    dest = random.randint(0, 7)
+    src_a = random.randint(0, 7)
+    src_b = random.randint(0, 7)
+    imm_a = random.randint(0, 255)
+    imm_b = random.randint(0, 255)
+    expected_val = (imm_a & imm_b)
+    if (src_a == src_b):
+        expected_val = imm_b
+    await do_preamble(dut)
+    # reg[src_a] = imm_a
+    await execute_store(dut, src_a, imm_a)
+    # reg[src_b] = imm_b
+    await execute_store(dut, src_b, imm_b)
+    # reg[dest] = reg[src_a] & reg[src_b]
+    await execute_and(dut, dest, src_a, src_b)
+    await execute_disp(dut, dest)
+    await check_out(dut, expected_val)
 
 @cocotb.test(skip=True)
 async def and_i(dut):
