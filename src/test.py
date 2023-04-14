@@ -93,7 +93,8 @@ def check_fetch(dut, opcode=None, opcode_valid=1, dest=None, src_a=None, src_b=N
     if imm is not None:
         assert int(dut.toy.fetch.imm) == imm
 
-def check_out(dut, out_val):
+async def check_out(dut, out_val):
+    await FallingEdge(dut.clk)
     assert int(dut.io_out) == out_val
 
 @cocotb.test()
@@ -204,19 +205,26 @@ async def disp(dut):
     imm = random.randint(0, 255)
     await do_preamble(dut)
     await execute_disp(dut, reg)
-    await FallingEdge(dut.clk)
-    check_out(dut, 0)
+    await check_out(dut, 0)
     await execute_store(dut, reg, imm)
     await execute_disp(dut, reg)
-    await FallingEdge(dut.clk)
-    check_out(dut, imm)
+    await check_out(dut, imm)
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def add(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x08
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 2
+    dest = random.randint(0, 7)
+    src_a = random.randint(0, 7)
+    src_b = random.randint(0, 7)
+    imm_a = random.randint(0, 255)
+    imm_b = random.randint(0, 255)
+    expected_val = (imm_a + imm_b) & 0xff
+    if (src_a == src_b):
+        expected_val = (imm_b + imm_b) & 0xff
+    await do_preamble(dut)
+    await execute_store(dut, src_a, imm_a)
+    await execute_store(dut, src_b, imm_b)
+    await execute_add(dut, dest, src_a, src_b)
+    await check_out(dut, expected_val)
 
 @cocotb.test(skip=True)
 async def add_i(dut):
