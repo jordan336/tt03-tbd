@@ -113,7 +113,11 @@ module instr_fetch (input            clk,
     end
   end
 
-  always @(posedge clk) begin
-    op_valid <= op_valid_next;
+  always @(posedge clk, posedge rst) begin
+    if (rst == 1'b1) begin
+      op_valid <= 0;
+    end else begin
+      op_valid <= op_valid_next;
+    end
   end
 endmodule

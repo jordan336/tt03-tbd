@@ -13,17 +13,12 @@ module toy_cpu (input        clk,
   wire [7:0] reg_out1;
   wire opcode_imm;
   wire [7:0] alu_b;
-  reg [2:0] opcode_d;
 
   assign opcode_imm = ((opcode === 3'b010) ||
                        (opcode === 3'b100) ||
                        (opcode === 3'b110));
 
   assign alu_b = opcode_imm ? imm : reg_out1;
-
-  always @(posedge clk) begin
-    opcode_d <= opcode;
-  end
 
   reg_file reg_file(.clk(clk),
                     .rst(rst),
@@ -35,7 +30,7 @@ module toy_cpu (input        clk,
                     .out0(reg_out0),
                     .out1(reg_out1));
 
-  alu alu(.opcode(opcode_d),
+  alu alu(.opcode(opcode),
           .a(reg_out0),
           .b(alu_b),
           .out(out));
