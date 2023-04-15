@@ -245,7 +245,10 @@ async def add_i(dut):
     await execute_disp(dut, dest)
     await check_out(dut, (imm + imm) & 0xff)
     await execute_disp(dut, src)
-    await check_out(dut, 0)
+    if dest != src:
+        await check_out(dut, 0)
+    else:
+        await check_out(dut, (imm + imm) & 0xff)
 
 @cocotb.test()
 async def _and(dut):
