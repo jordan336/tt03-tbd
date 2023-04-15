@@ -267,31 +267,76 @@ async def _and(dut):
     await execute_disp(dut, dest)
     await check_out(dut, expected_val)
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def and_i(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x20
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 16
+    dest = random.randint(0, 7)
+    src = random.randint(0, 7)
+    imm_a = random.randint(0, 255)
+    imm_b = random.randint(0, 255)
+    await do_preamble(dut)
+    # reg[dest] = reg[src] & imm_a
+    await execute_and_i(dut, dest, src, imm_a)
+    await execute_disp(dut, dest)
+    await check_out(dut, 0)
+    # reg[src] = imm_b
+    await execute_store(dut, src, imm_b)
+    # reg[dest] = reg[src] & imm_a
+    await execute_and_i(dut, dest, src, imm_a)
+    await execute_disp(dut, dest)
+    await check_out(dut, (imm_a & imm_b))
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def _or(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x28
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 32
+    dest = random.randint(0, 7)
+    src_a = random.randint(0, 7)
+    src_b = random.randint(0, 7)
+    imm_a = random.randint(0, 255)
+    imm_b = random.randint(0, 255)
+    expected_val = (imm_a | imm_b)
+    if (src_a == src_b):
+        expected_val = imm_b
+    await do_preamble(dut)
+    # reg[src_a] = imm_a
+    await execute_store(dut, src_a, imm_a)
+    # reg[src_b] = imm_b
+    await execute_store(dut, src_b, imm_b)
+    # reg[dest] = reg[src_a] | reg[src_b]
+    await execute_or(dut, dest, src_a, src_b)
+    await execute_disp(dut, dest)
+    await check_out(dut, expected_val)
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def or_i(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x30
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 64
+    dest = random.randint(0, 7)
+    src = random.randint(0, 7)
+    imm_a = random.randint(0, 255)
+    imm_b = random.randint(0, 255)
+    await do_preamble(dut)
+    # reg[dest] = reg[src] | imm_a
+    await execute_or_i(dut, dest, src, imm_a)
+    await execute_disp(dut, dest)
+    await check_out(dut, imm_a)
+    # reg[src] = imm_b
+    await execute_store(dut, src, imm_b)
+    # reg[dest] = reg[src] | imm_a
+    await execute_or_i(dut, dest, src, imm_a)
+    await execute_disp(dut, dest)
+    await check_out(dut, (imm_a | imm_b))
 
-@cocotb.test(skip=True)
+@cocotb.test()
 async def store(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_US, "us").start())
-    dut.instr.value = 0x38
-    await Timer(CLK_PERIOD_US, units="us")
-    assert int(dut.io_out.value) == 128
+    stored_val = {}
+    dests = [i for i in range(0, 7)]
+    random.shuffle(dests)
+    await do_preamble(dut)
+    # Store random values
+    for dest in dests:
+        imm = random.randint(0, 255)
+        await execute_store(dut, dest, imm)
+        stored_val[dest] = imm
+    # Check stored values
+    random.shuffle(dests)
+    for dest in dests:
+        await execute_disp(dut, dest)
+        await check_out(dut, stored_val[dest])
 
