@@ -82,9 +82,9 @@ documentation:
       After exiting reset, the Toy CPU looks for a start input to begin processing the instruction stream. The start input is all 1s in the 6 bit instruction word (0x3F). After sampling the start sequence, the CPU will interpret the next 6 bit instruction word as the first word in the instruction stream.
 
 
-  # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
-    how_to_test:  |
-        Drive a clock on input pin 0 and perform a reset using pin 1. Drive the start input on the 6 bit instruction word, then encode your instructions in the above format on the 6 bit instruction word interface.
+# Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
+  how_to_test:  |
+      Drive a clock on input pin 0 and perform a reset using pin 1. Drive the start input on the 6 bit instruction word, then encode your instructions in the above format on the 6 bit instruction word interface.
 
 # A description of what the inputs do
   inputs:               
