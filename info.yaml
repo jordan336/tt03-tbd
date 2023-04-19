@@ -30,19 +30,6 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-      ### I/O Interface
-
-      |#|Input         |Output     |
-      |-|--------------|-----------|
-      |0|clk           |data_out[0]|
-      |1|rst           |data_out[1]|
-      |2|instruction[0]|data_out[2]|
-      |3|instruction[1]|data_out[3]|
-      |4|instruction[2]|data_out[4]|
-      |5|instruction[3]|data_out[5]|
-      |6|instruction[4]|data_out[5]|
-      |7|instruction[5]|data_out[6]|
-
       ### ISA
 
       |Opcode|Mnemonic|Name           |Description                         |

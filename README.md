@@ -14,8 +14,8 @@ Toy CPU is an 8 bit toy CPU for the Tiny Tapeout project.
 |3|instruction[1]|data_out[3]|
 |4|instruction[2]|data_out[4]|
 |5|instruction[3]|data_out[5]|
-|6|instruction[4]|data_out[5]|
-|7|instruction[5]|data_out[6]|
+|6|instruction[4]|data_out[6]|
+|7|instruction[5]|data_out[7]|
 
 # ISA
 
